@@ -20,11 +20,7 @@ namespace Yanyitec.Logs
         /// 一般对应着Url或Controller的类名
         /// </summary>
         public string TraceId { get; set; }
-        /// <summary>
-        /// 会话Id,
-        /// 一般对应着UserId或sessionId
-        /// </summary>
-        public string SessionId { get; set; }
+        
         /// <summary>
         /// 日志分类
         /// 一般对应着类名

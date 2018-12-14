@@ -4,6 +4,8 @@
     {
         ILogWriter CategoryLogWriter { get; set; }
         IDetailsFormater DetailsFormater { get; }
+
+        LogLevels LogLevel { get; set; }
         string Host { get; }
         ILogWriter TraceLogWriter { get; set; }
 

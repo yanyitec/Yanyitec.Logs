@@ -6,6 +6,7 @@ namespace Yanyitec.Logs
 {
     public enum LogLevels
     {
+        Trace= -1,
         All = 0,
         Debug,
         Success,

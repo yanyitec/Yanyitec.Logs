@@ -42,7 +42,8 @@ namespace Yanyitec.Logs
             {
                 foreach (var wr in writer)
                 {
-                    if (_Writers.Any(w => w == wr )) continue;
+                    
+                    if (_Writers.Any(w => w.Equals(wr) )) continue;
 
                 }
             }
@@ -59,8 +60,10 @@ namespace Yanyitec.Logs
             throw new InvalidOperationException("LogWriterCollection不应该调用该方法，调用该方法前应该检查IsCollection属性");
         }
 
-        public ILogWriter Clone() {
-            return new LogWriterCollection(this._Writers);
+        public ILogWriter Clone(string category) {
+            var ls = new List<ILogWriter>();
+            foreach (var w in this._Writers) ls.Add(w.Clone(category));
+            return new LogWriterCollection(ls);
         }
 
         public IEnumerator<ILogWriter> GetEnumerator()

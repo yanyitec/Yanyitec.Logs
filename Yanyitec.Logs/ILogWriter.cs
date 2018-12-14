@@ -17,6 +17,6 @@ namespace Yanyitec.Logs
 
         IDetailsFormater Formater { get; set; }
 
-        ILogWriter Clone();
+        ILogWriter Clone(string category);
     }
 }

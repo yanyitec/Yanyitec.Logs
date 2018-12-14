@@ -6,23 +6,29 @@ namespace Yanyitec.Logs
 {
     public class Logger : ILogger
     {
-        public static Logger Default = new Logger(System.Net.Dns.GetHostName(),LogWriter.Default,"",null,null);
-        public Logger(string host,ILogWriter categoryWriter, string category,ILogWriter traceWriter, string traceId) {
+        public static Logger Default = new Logger(Logs.LoggerFactory.Default,System.Net.Dns.GetHostName(),LogWriter.Default,"",null,null);
+        public Logger(ILoggerFactory loggerFactory, string host,ILogWriter categoryWriter, string category,ILogWriter traceWriter, string traceId) {
             this.Host = host;
             this.CategoryWriter = categoryWriter;
             if(traceWriter!=null)this.TraceWriter = traceWriter.AddLogWriter(categoryWriter);
             this.TraceId = traceId;
+            this.LoggerFactory = loggerFactory;
+            this.Category = category;
 
         }
+        public ILoggerFactory LoggerFactory { get; private set; }
         public string Host { get; private set; }
-        public string Category { get; private set; }
+        public string Category {
+            get;
+            private set;
+        }
 
         public string TraceId { get; private set; }
 
         public ILogWriter TraceWriter { get; private set; }
         public ILogWriter CategoryWriter { get; private set; }
 
-        public void Message(object details,string message, params object[] args) {
+        public void MessageWithDetails(object details,string message, params object[] args) {
             var entry = new LogEntry()
             {
                 Level = LogLevels.All,
@@ -52,7 +58,7 @@ namespace Yanyitec.Logs
             if (this.TraceWriter != null && this.TraceId!=null) this.TraceWriter.RecordLog(entry);
             else this.CategoryWriter.RecordLog(entry);
         }
-        public void Debug(object details, string message, params object[] args)
+        public void DebugWithDetails(object details, string message,params object[] args)
         {
             var entry = new LogEntry()
             {
@@ -82,7 +88,7 @@ namespace Yanyitec.Logs
             if (this.TraceWriter != null && this.TraceId!=null) this.TraceWriter.RecordLog(entry);
             else this.CategoryWriter.RecordLog(entry);
         }
-        public void Success(object details, string message, params object[] args)
+        public void SuccessWithDetails(object details, string message,params object[] args)
         {
             var entry = new LogEntry()
             {
@@ -115,7 +121,7 @@ namespace Yanyitec.Logs
             else this.CategoryWriter.RecordLog(entry);
         }
 
-        public void Info(object details, string message, params object[] args)
+        public void InfoWithDetails(object details, string message,params object[] args)
         {
             var entry = new LogEntry()
             {
@@ -148,7 +154,7 @@ namespace Yanyitec.Logs
             else this.CategoryWriter.RecordLog(entry);
         }
 
-        public void Notice(object details, string message, params object[] args)
+        public void NoticeWithDetails(object details, string message,params object[] args)
         {
             var entry = new LogEntry()
             {
@@ -181,7 +187,7 @@ namespace Yanyitec.Logs
             else this.CategoryWriter.RecordLog(entry);
         }
 
-        public void Warn(object details, string message, params object[] args)
+        public void WarnWithDetails(object details, string message,params object[] args)
         {
             var entry = new LogEntry()
             {
@@ -213,7 +219,7 @@ namespace Yanyitec.Logs
             this.CategoryWriter.RecordLog(entry);
         }
 
-        public void Error(object details, string message, params object[] args)
+        public void ErrorWithDetails(object details, string message,params object[] args)
         {
             var entry = new LogEntry()
             {
@@ -243,6 +249,10 @@ namespace Yanyitec.Logs
             
             if (this.TraceWriter != null && this.TraceId!=null) this.TraceWriter.RecordLog(entry);
             this.CategoryWriter.RecordLog(entry);
+        }
+
+        public void Error(Exception details, string message = null, params object[] args) {
+            this.ErrorWithDetails(details,message,args);
         }
     }
 }

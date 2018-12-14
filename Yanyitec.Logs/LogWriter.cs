@@ -1,19 +1,24 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Yanyitec.Logs
 {
     public abstract class LogWriter : ILogWriter {
-        public static LogWriter Default = new ConsoleLogWriter(); 
+        public static LogWriter Default = new ConsoleLogWriter();
+        public static LogWriter DefaultError = new FileLogWriter(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Logs/__err__"));
+        public static LogWriter DefaultTrace = new TraceLogWriter();
+
         public IDetailsFormater Formater { get; set; }
         public WritingClainNode Head { get; private set; }
         public WritingClainNode Tail { get; private set; }
         Task _WritingTask;
         public bool IsCollection => false;
         public void RecordLog(LogEntry entry) {
+            entry.LogTime = DateTime.Now;
             var node = new WritingClainNode(entry);
             lock (this)
             {
@@ -67,19 +72,30 @@ namespace Yanyitec.Logs
 
         public virtual async Task PersistentLogs(WritingClainNode node) {
             while (node != null) {
-                await this.WriteLog(node.Entry);
-                node = node.Next;
+                try {
+                    await this.WriteLog(node.Entry);
+                    node = node.Next;
+                } catch (Exception ex) {
+                    var c = Console.ForegroundColor;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(ex.Message);
+                    Console.WriteLine(ex.StackTrace);
+                    Console.ForegroundColor = c;
+                }
+                
             }
         }
 
-        protected abstract Task WriteLog(LogEntry entry);
+        protected virtual Task WriteLog(LogEntry entry) {
+            throw new InvalidOperationException("需要继承的Writer重写WriteLog/WriteLogs函数");
+        }
 
         
-        public ILogWriter Clone() { return this; }
+        public virtual ILogWriter Clone(string category) { return this; }
 
         public ILogWriter AddLogWriter(ILogWriter writer)
         {
-            if (this==writer) return this;
+            if (writer==null || this.Equals(writer)) return this;
             var rs = new LogWriterCollection();
             rs.AddLogWriter(this);
             rs.AddLogWriter(writer);

@@ -24,10 +24,20 @@ namespace Yanyitec.Logs
         
         public ILogWriter CategoryLogWriter { get; set; }
         public ILogWriter TraceLogWriter { get; set; }
-        public ILogger GetOrCreateLogger(string category,string traceId=null) {
-            var logger = _CategoryWriters.GetOrAdd(category,(cate)=> new Logger(this.Host, CategoryLogWriter.Clone(), category, null, null));
-            if (traceId == null) return logger;
-            return new Logger(this.Host,logger.CategoryWriter, category, this.TraceLogWriter, traceId);
+        LogLevels _LogLevel;
+        public LogLevels LogLevel {
+            get {
+                return _LogLevel;
+            }
+            set {
+                lock (this) _LogLevel = value;
+            }
+        }
+
+        public ILogger GetOrCreateLogger(string category,string logTraceId=null) {
+            var logger = _CategoryWriters.GetOrAdd(category,(cate)=> new Logger(this,this.Host, CategoryLogWriter.Clone(cate), category, null, null));
+            if (logTraceId == null) return logger;
+            return new Logger(this,this.Host,logger.CategoryWriter, category, logger.TraceWriter, logTraceId);
         }
 
         public void AddCategoryWriter(ILogWriter writer) {
