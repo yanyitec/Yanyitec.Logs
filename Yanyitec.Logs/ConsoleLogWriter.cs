@@ -38,7 +38,7 @@ namespace Yanyitec.Logs
         public static Encoding GB2312 = CodePagesEncodingProvider.Instance.GetEncoding("gb2312");
         protected override async Task WriteLog(LogEntry entry)
         {
-            var fmt = Formats[entry.Level];
+            var fmt = Formats[entry.LogLevel];
             //var encoding = Console.OutputEncoding;
             //var color = Console.ForegroundColor;
 

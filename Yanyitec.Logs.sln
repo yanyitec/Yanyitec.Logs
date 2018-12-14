@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yanyitec.Logs.Sqlite", "Yanyitec.Logs.Sqlite\Yanyitec.Logs.Sqlite.csproj", "{255C441A-0D52-4187-9966-0798758AC333}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,10 @@ Global
 		{B12B59B0-D084-4C82-86BC-81E092AF67BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B12B59B0-D084-4C82-86BC-81E092AF67BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B12B59B0-D084-4C82-86BC-81E092AF67BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{255C441A-0D52-4187-9966-0798758AC333}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{255C441A-0D52-4187-9966-0798758AC333}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{255C441A-0D52-4187-9966-0798758AC333}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{255C441A-0D52-4187-9966-0798758AC333}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

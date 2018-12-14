@@ -10,7 +10,7 @@ namespace Yanyitec.Logs
         public static void Main(string[] args) {
             Console.OutputEncoding = ConsoleLogWriter.GB2312;
             Console.WriteLine("====基本测试===");
-            TestLogger(Logger.Default);
+            UseLog(Logger.Default);
             Console.WriteLine("====ConsoleLoggerWriter不会添加两次===");
             LoggerFactory.Default.AddCategoryWriter(ConsoleLogWriter.Default);
             Console.WriteLine(".AddCategoryWriter(ConsoleLogWriter.Default):"+ LoggerFactory.Default.CategoryLogWriter.Count.ToString());
@@ -28,13 +28,13 @@ namespace Yanyitec.Logs
             var authLogger = LoggerFactory.Default.GetOrCreateLogger("Auth");
             Console.WriteLine("authLogger.Category=" + authLogger.Category);
             Console.WriteLine("====向authLogger写一轮日志===");
-            TestLogger(authLogger);
+            UseLog(authLogger);
 
             Console.WriteLine("Press any to exit...");
             Console.ReadKey();
         }
 
-        static void TestLogger(ILogger logger) {
+        public static void UseLog(ILogger logger) {
             logger.Debug("我是{0}","Debug");
             logger.Success("我是{0}", "Success");
             logger.Info("我是{0}", "Info");

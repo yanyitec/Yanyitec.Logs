@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,17 +23,29 @@ namespace Yanyitec.Logs
             return other.DbName == this.DbName;
         }
 
+        public static string CreateTableSql = @"
+CREATE TABLE {0}Logs (
+    LogTime DateTime,
+    Host varchar(256),
+    Category varchar(256),
+    TraceId varchar(512),
+    LogLevel int,
+    Message varchar(1024),
+    Details text
+);
+";
+
         
 
         public override async Task PersistentLogs(WritingClainNode node)
         {
             using (var conn = this.GetOrCreateConnection(this.DbName)) {
-                conn.Open();
+                await conn.OpenAsync();
                 while (node != null)
                 {
                     var cmd = this.BuildCommand(conn,node.Entry);
                     try {
-                        cmd.ExecuteNonQuery();
+                        await cmd.ExecuteNonQueryAsync();
                     } catch(Exception ex) {
                         var c = Console.ForegroundColor;
                         Console.ForegroundColor = ConsoleColor.Red;
@@ -43,73 +56,80 @@ namespace Yanyitec.Logs
                     
                     node = node.Next;
                 }
+                this.Command = null;
             }
                 
         }
 
         protected virtual string MakeSql() {
-            var sql = "INSERT INTO __Logs (Category,Details,Host,Level,LogTime,Message,TraceId) VALUES(?,?,?,?,?,?,?)";
+            var sql = @"
+INSERT INTO itec_Logs (
+    Category,Details,Host,LogLevel,LogTime,Message,TraceId
+) VALUES(
+    @Category,@Details,@Host,@LogLevel,@LogTime,@Message,@TraceId
+)";
             return sql;
         }
 
-        protected abstract IDbConnection GetOrCreateConnection(string connName);
-        protected IDbCommand Command;
-        protected virtual IDbCommand BuildCommand( IDbConnection conn, LogEntry entry) {
+        protected abstract DbConnection GetOrCreateConnection(string connName);
+        protected DbCommand Command;
+        protected virtual DbCommand BuildCommand( DbConnection conn, LogEntry entry) {
             if (Command != null)
             {
-                Command.Parameters.Clear();
-                AddParameters(Command, entry, this.ParameterNeedName);
+                //Command.Parameters.Clear();
+                //AddParameters(Command, entry);
             }
-            else {
+            {
                 Command = conn.CreateCommand();
-                AddParameters(Command, entry, this.ParameterNeedName);
+                Command.CommandText = this.MakeSql();
+                AddParameters(Command, entry);
             }
             return Command;
         }
 
         protected virtual bool ParameterNeedName{get;set;}
 
-        void AddParameters(IDbCommand cmd, LogEntry entry,bool namedParam=false) {
+        void AddParameters(IDbCommand cmd, LogEntry entry) {
             var dbParam = cmd.CreateParameter();
-            if(namedParam)dbParam.ParameterName = "@Category";
+            dbParam.ParameterName = "@Category";
             dbParam.DbType = DbType.String;
-            dbParam.Value = entry.Category;
+            dbParam.Value = entry.Category??string.Empty;
             cmd.Parameters.Add(dbParam);
 
             dbParam = cmd.CreateParameter();
-            if (namedParam)dbParam.ParameterName = "@Details";
+            dbParam.ParameterName = "@Details";
             dbParam.DbType = DbType.String;
             dbParam.Value = entry.DetailsObject==null?string.Empty:(Formater==null?entry.DetailsObject.ToString():Formater.Format(entry.DetailsObject));
             cmd.Parameters.Add(dbParam);
 
             dbParam = cmd.CreateParameter();
-            if (namedParam) dbParam.ParameterName = "@Host";
+            dbParam.ParameterName = "@Host";
             dbParam.DbType = DbType.String;
-            dbParam.Value = entry.Host;
+            dbParam.Value = entry.Host ?? string.Empty;
             cmd.Parameters.Add(dbParam);
 
             dbParam = cmd.CreateParameter();
-            if (namedParam) dbParam.ParameterName = "@Level";
-            dbParam.DbType = DbType.String;
-            dbParam.Value = Enum.GetName(typeof(LogLevels),entry.Level);
+            dbParam.ParameterName = "@LogLevel";
+            dbParam.DbType = DbType.Int32;
+            dbParam.Value = (int)entry.LogLevel;
             cmd.Parameters.Add(dbParam);
 
             dbParam = cmd.CreateParameter();
-            if (namedParam) dbParam.ParameterName = "@LogTime";
+            dbParam.ParameterName = "@LogTime";
             dbParam.DbType = DbType.DateTime;
             dbParam.Value = entry.LogTime;
             cmd.Parameters.Add(dbParam);
 
             dbParam = cmd.CreateParameter();
-            if (namedParam) dbParam.ParameterName = "@Message";
+            dbParam.ParameterName = "@Message";
             dbParam.DbType = DbType.String;
             dbParam.Value = entry.Message==null?string.Empty:(entry.MessageReplacements==null?entry.Message:string.Format(entry.Message,entry.MessageReplacements));
             cmd.Parameters.Add(dbParam);
 
             dbParam = cmd.CreateParameter();
-            if (namedParam) dbParam.ParameterName = "@TraceId";
+            dbParam.ParameterName = "@TraceId";
             dbParam.DbType = DbType.String;
-            dbParam.Value = entry.TraceId;
+            dbParam.Value = entry.TraceId ?? string.Empty;
             cmd.Parameters.Add(dbParam);
         }
     }

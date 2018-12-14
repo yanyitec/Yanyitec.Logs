@@ -33,7 +33,7 @@ namespace Yanyitec.Logs
         protected string LastDir;
         protected DateTime LastFiletime;
 
-        protected static void EnsureDirExists(string path,bool isfile=false) {
+        public static void EnsureDirExists(string path,bool isfile=false) {
             if (!isfile) {
                 if (!Directory.Exists(path)) {
                     try {
@@ -85,7 +85,7 @@ namespace Yanyitec.Logs
         }
         public static string Spliter = "----------------------------------------";
         async Task WriteToStream(LogEntry entry, TextWriter stream) {
-            var fmt = ConsoleLogWriter.Formats[entry.Level];
+            var fmt = ConsoleLogWriter.Formats[entry.LogLevel];
             await stream.WriteLineAsync(Spliter);
             await stream.WriteAsync("[");
             await stream.WriteAsync(fmt.LevelName);

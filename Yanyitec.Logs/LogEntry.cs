@@ -34,7 +34,7 @@ namespace Yanyitec.Logs
         /// <summary>
         /// 日志等级
         /// </summary>
-        public LogLevels Level { get; set; }
+        public LogLevels LogLevel { get; set; }
 
         /// <summary>
         /// 日志消息
