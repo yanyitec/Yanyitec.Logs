@@ -22,6 +22,11 @@ namespace Yanyitec.Logs
             return other.DbName == this.DbName;
         }
 
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         public override async Task PersistentLogs(WritingClainNode node)
         {
             using (var conn = this.GetOrCreateConnection(this.DbName)) {

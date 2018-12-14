@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using System.Text.Encoding.CodePages;
-
 namespace Yanyitec.Logs
 {
     public class ConsoleLogWriter:LogWriter
@@ -29,19 +27,20 @@ namespace Yanyitec.Logs
             public string LevelName;
             public string Space;
         }
+
+        static Encoding GB2312 = CodePagesEncodingProvider.Instance.GetEncoding("gb2312");
         protected override async Task WriteLog(LogEntry entry)
         {
             var fmt = Formats[entry.Level];
-            Console.OutputEncoding = UTF8Encoding.UTF8;
+            Console.OutputEncoding = GB2312;
             Console.ForegroundColor = fmt.Color;
 
             Console.Write("[");
             Console.Write(fmt.LevelName);
             Console.Write("]:");
             Console.Write(fmt.Space);
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write(entry.LogTime);
             Console.ForegroundColor = ConsoleColor.Gray;
+            Console.Write(entry.LogTime);
             if (entry.Category != null)
             {
                 Console.Write(entry.Category);
@@ -63,8 +62,8 @@ namespace Yanyitec.Logs
 
             Console.WriteLine();
 
-            
 
+            Console.ForegroundColor = ConsoleColor.White;
             if (entry.Message != null)
             {
                 var message = entry.MessageReplacements == null ? entry.Message : string.Format(entry.Message, entry.MessageReplacements);
@@ -75,7 +74,7 @@ namespace Yanyitec.Logs
             {
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine("[DETAILS]: ");
-                Console.ForegroundColor = ConsoleColor.White;
+                //Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine(this.Formater == null ? entry.DetailsObject.ToString() : this.Formater.Format(entry.DetailsObject));
             }
             Console.WriteLine();
