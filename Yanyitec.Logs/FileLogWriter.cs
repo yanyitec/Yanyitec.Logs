@@ -83,38 +83,44 @@ namespace Yanyitec.Logs
             this.LastFilename = filename;
             this.LastFiletime = entry.LogTime;
         }
+        public static string Spliter = "----------------------------------------";
         async Task WriteToStream(LogEntry entry, TextWriter stream) {
-            await stream.WriteAsync("##");
+            var fmt = ConsoleLogWriter.Formats[entry.Level];
+            await stream.WriteLineAsync(Spliter);
+            await stream.WriteAsync("[");
+            await stream.WriteAsync(fmt.LevelName);
+            await stream.WriteAsync("]");
+            await stream.WriteAsync(fmt.Space);
+
             await stream.WriteAsync(entry.LogTime.ToString("yyyy-MM-dd hh:mm:ss"));
-            await stream.WriteAsync(" [");
-            await stream.WriteAsync(Enum.GetName(typeof(LogLevels),entry.Level));
-            await stream.WriteLineAsync("]------------------------");
+            if (entry.Category != null)
+            {
+                await stream.WriteAsync(entry.Category);
+            }
+            if (entry.Host != null)
+            {
+                await stream.WriteAsync("@");
+                await stream.WriteAsync(entry.Host);
+            }
+
+            if (entry.TraceId != null)
+            {
+
+                await stream.WriteAsync(" #");
+                await stream.WriteLineAsync(entry.TraceId);
+            }
 
             if (entry.Message != null) {
                 var message = entry.MessageReplacements == null ? entry.Message : string.Format(entry.Message, entry.MessageReplacements);
                 await stream.WriteLineAsync(message);
             }
-            if (entry.Category != null)
-            {
-                
-                await stream.WriteAsync("#CATEGORY: ");
-                await stream.WriteLineAsync(entry.Category);
-            }
-            if (entry.TraceId != null)
-            {
-
-                await stream.WriteAsync("#TRACE: ");
-                await stream.WriteLineAsync(entry.TraceId);
-            }
-            if (entry.Host!= null)
-            {
-                await stream.WriteAsync("#HOST: ");
-                await stream.WriteLineAsync(entry.Host);
-            }
+            
+            
+            
 
             if (entry.DetailsObject != null)
             {
-                await stream.WriteAsync("#DETAILS: ");
+                await stream.WriteLineAsync("[DETAILS]:");
                 string msg = null;
                 try {
                     msg = this.Formater == null ? entry.DetailsObject.ToString() : this.Formater.Format(entry.DetailsObject);

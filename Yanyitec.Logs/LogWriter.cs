@@ -42,9 +42,9 @@ namespace Yanyitec.Logs
 
 
         async Task WriteLogs() {
-            var totalKeepCount = 10;
+            var totalKeepCount = 80;
             var keepCount = totalKeepCount;           
-            var delayMilliseconds = 200;
+            var delayMilliseconds = 120;
             while (true) {
                 
                 WritingClainNode node = null;
@@ -57,7 +57,10 @@ namespace Yanyitec.Logs
                 {
                     if (--keepCount <= 0)
                     {
-                        this._WritingTask = null;
+                        lock (this) {
+                            if(this.Head==null) this._WritingTask = null;
+                        }
+                        
                         return;
                     }
                 } else {

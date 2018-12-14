@@ -28,7 +28,12 @@ namespace Yanyitec.Logs
         public ILogWriter TraceWriter { get; private set; }
         public ILogWriter CategoryWriter { get; private set; }
 
-        public void MessageWithDetails(object details,string message, params object[] args) {
+        public void Log(LogLevels lv ,object details, string message, params object[] args)
+        {
+            if (this.TraceWriter == null
+                && (int)this.LoggerFactory.LogLevel > (int)lv
+                ) return;
+
             var entry = new LogEntry()
             {
                 Level = LogLevels.All,
@@ -36,223 +41,84 @@ namespace Yanyitec.Logs
                 DetailsObject = details,
                 TraceId = TraceId,
                 Category = Category,
-				Host = Host,
-                MessageReplacements = args
-            };
-            
-            if (this.TraceWriter != null && this.TraceId!=null) this.TraceWriter.RecordLog(entry);
-            else this.CategoryWriter.RecordLog(entry);
-        }
-        public void Message( string message, params object[] args)
-        {
-            var entry = new LogEntry()
-            {
-                Level = LogLevels.All,
-                Message = message,
-                TraceId = TraceId,
-                Category = Category,
-				Host = Host,
+                Host = Host,
                 MessageReplacements = args
             };
 
-            if (this.TraceWriter != null && this.TraceId!=null) this.TraceWriter.RecordLog(entry);
-            else this.CategoryWriter.RecordLog(entry);
+            if (this.TraceWriter != null && this.TraceId != null)
+                this.TraceWriter.RecordLog(entry);
+            else if((int)this.LoggerFactory.LogLevel <= (int)lv)
+                this.CategoryWriter.RecordLog(entry);
         }
-        public void DebugWithDetails(object details, string message,params object[] args)
+
+
+        public void MessageDetails(object details,string message, params object[] args) {
+            this.Log(LogLevels.All, details, message, args);
+        }
+        public void Message( string message, params object[] args)
         {
-            var entry = new LogEntry()
-            {
-                Level = LogLevels.Debug,
-                Message = message,
-                DetailsObject = details,
-                TraceId = TraceId,
-                Category = Category,
-				Host = Host,
-                MessageReplacements = args
-            };
-            if (this.TraceWriter != null && this.TraceId!=null) this.TraceWriter.RecordLog(entry);
-            else this.CategoryWriter.RecordLog(entry);
+            this.Log(LogLevels.All,null,message,args);
+        }
+        public void DebugDetails(object details, string message,params object[] args)
+        {
+            this.Log(LogLevels.Debug, details, message, args);
         }
 
         public void Debug(string message, params object[] args)
         {
-            var entry = new LogEntry()
-            {
-                Level = LogLevels.Debug,
-                Message = message,
-                TraceId = TraceId,
-                Category = Category,
-				Host = Host,
-                MessageReplacements = args
-            };
-            if (this.TraceWriter != null && this.TraceId!=null) this.TraceWriter.RecordLog(entry);
-            else this.CategoryWriter.RecordLog(entry);
+            this.Log(LogLevels.Debug, null, message, args);
         }
-        public void SuccessWithDetails(object details, string message,params object[] args)
+        public void SuccessDetails(object details, string message,params object[] args)
         {
-            var entry = new LogEntry()
-            {
-                Level = LogLevels.Success,
-                Message = message,
-                DetailsObject = details,
-                TraceId = TraceId,
-                Category = Category,
-				Host = Host,
-                MessageReplacements = args
-            };
-            
-            if (this.TraceWriter != null && this.TraceId!=null) this.TraceWriter.RecordLog(entry);
-            else this.CategoryWriter.RecordLog(entry);
+            this.Log(LogLevels.Success, details, message, args);
         }
 
         public void Success( string message, params object[] args)
         {
-            var entry = new LogEntry()
-            {
-                Level = LogLevels.Success,
-                Message = message,
-                TraceId = TraceId,
-                Category = Category,
-				Host = Host,
-                MessageReplacements = args
-            };
-            
-            if (this.TraceWriter != null && this.TraceId!=null) this.TraceWriter.RecordLog(entry);
-            else this.CategoryWriter.RecordLog(entry);
+            this.Log(LogLevels.Success, null, message, args);
         }
 
-        public void InfoWithDetails(object details, string message,params object[] args)
+        public void InfoDetails(object details, string message,params object[] args)
         {
-            var entry = new LogEntry()
-            {
-                Level = LogLevels.Info,
-                Message = message,
-                DetailsObject = details,
-                TraceId = TraceId,
-                Category = Category,
-				Host = Host,
-                MessageReplacements = args
-            };
-            
-            if (this.TraceWriter != null && this.TraceId!=null) this.TraceWriter.RecordLog(entry);
-            else this.CategoryWriter.RecordLog(entry);
+
+            this.Log(LogLevels.Info, details, message, args);
         }
 
         public void Info( string message, params object[] args)
         {
-            var entry = new LogEntry()
-            {
-                Level = LogLevels.Info,
-                Message = message,
-                TraceId = TraceId,
-                Category = Category,
-				Host = Host,
-                MessageReplacements = args
-            };
-            
-            if (this.TraceWriter != null && this.TraceId!=null) this.TraceWriter.RecordLog(entry);
-            else this.CategoryWriter.RecordLog(entry);
+            this.Log(LogLevels.Info, null, message, args);
         }
 
-        public void NoticeWithDetails(object details, string message,params object[] args)
+        public void NoticeDetails(object details, string message,params object[] args)
         {
-            var entry = new LogEntry()
-            {
-                Level = LogLevels.Notice,
-                Message = message,
-                DetailsObject = details,
-                TraceId = TraceId,
-                Category = Category,
-				Host = Host,
-                MessageReplacements = args
-            };
-            
-            if (this.TraceWriter != null && this.TraceId!=null) this.TraceWriter.RecordLog(entry);
-            else this.CategoryWriter.RecordLog(entry);
+            this.Log(LogLevels.Notice, details, message, args);
         }
 
         public void Notice(string message, params object[] args)
         {
-            var entry = new LogEntry()
-            {
-                Level = LogLevels.Notice,
-                Message = message,
-                TraceId = TraceId,
-                Category = Category,
-				Host = Host,
-                MessageReplacements = args
-            };
-            
-            if (this.TraceWriter != null && TraceId!=null) this.TraceWriter.RecordLog(entry);
-            else this.CategoryWriter.RecordLog(entry);
+            this.Log(LogLevels.Notice, null, message, args);
         }
 
-        public void WarnWithDetails(object details, string message,params object[] args)
+        public void WarnDetails(object details, string message,params object[] args)
         {
-            var entry = new LogEntry()
-            {
-                Level = LogLevels.Warn,
-                Message = message,
-                DetailsObject = details,
-                TraceId = TraceId,
-                Category = Category,
-				Host = Host,
-                MessageReplacements = args
-            };
-            
-            if (this.TraceWriter != null && this.TraceId!=null) this.TraceWriter.RecordLog(entry);
-            else this.CategoryWriter.RecordLog(entry);
+            this.Log(LogLevels.Warn, details, message, args);
         }
         public void Warn(string message, params object[] args)
         {
-            var entry = new LogEntry()
-            {
-                Level = LogLevels.Warn,
-                Message = message,
-                TraceId = TraceId,
-                Category = Category,
-				Host = Host,
-                MessageReplacements = args
-            };
-            
-            if (this.TraceWriter != null && this.TraceId!=null) this.TraceWriter.RecordLog(entry);
-            this.CategoryWriter.RecordLog(entry);
+            this.Log(LogLevels.Warn, null, message, args);
         }
 
-        public void ErrorWithDetails(object details, string message,params object[] args)
+        public void ErrorDetails(object details, string message,params object[] args)
         {
-            var entry = new LogEntry()
-            {
-                Level = LogLevels.Error,
-                Message = message,
-                DetailsObject = details,
-                TraceId = TraceId,
-                Category = Category,
-				Host = Host,
-                MessageReplacements = args
-            };
-            
-            if (this.TraceWriter != null && this.TraceId!=null) this.TraceWriter.RecordLog(entry);
-            else this.CategoryWriter.RecordLog(entry);
+            this.Log(LogLevels.Error, details, message, args);
         }
         public void Error(string message, params object[] args)
         {
-            var entry = new LogEntry()
-            {
-                Level = LogLevels.Error,
-                Message = message,
-                TraceId = TraceId,
-                Category = Category,
-				Host = Host,
-                MessageReplacements = args
-            };
-            
-            if (this.TraceWriter != null && this.TraceId!=null) this.TraceWriter.RecordLog(entry);
-            this.CategoryWriter.RecordLog(entry);
+            this.Log(LogLevels.Error, null, message, args);
         }
 
         public void Error(Exception details, string message = null, params object[] args) {
-            this.ErrorWithDetails(details,message,args);
+            this.Log(LogLevels.Error, details, message==null?details?.Message:message, args);
         }
     }
 }

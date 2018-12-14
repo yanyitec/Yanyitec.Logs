@@ -6,7 +6,7 @@ namespace Yanyitec.Logs
 {
     public class ConsoleLogWriter:LogWriter
     {
-        static Dictionary<LogLevels, ConsoleFormat> Formats = new Dictionary<LogLevels, ConsoleFormat>() {
+        public static Dictionary<LogLevels, ConsoleFormat> Formats = new Dictionary<LogLevels, ConsoleFormat>() {
             { LogLevels.All, new ConsoleFormat(ConsoleColor.White,"All","    ") }
             ,{ LogLevels.Debug, new ConsoleFormat(ConsoleColor.Blue,"Debug","  ") }
             ,{ LogLevels.Success, new ConsoleFormat(ConsoleColor.Green,"Success","") }
@@ -15,7 +15,7 @@ namespace Yanyitec.Logs
             ,{ LogLevels.Warn, new ConsoleFormat(ConsoleColor.Magenta,"Warn","   ") }
             ,{ LogLevels.Error,new ConsoleFormat( ConsoleColor.Red,"Error","  ")}
         };
-        struct ConsoleFormat
+        public struct ConsoleFormat
         {
             public ConsoleFormat(ConsoleColor color, string name, string space)
             {

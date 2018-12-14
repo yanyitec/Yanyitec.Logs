@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2018
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yanyitec.Logs", "Yanyitec.Logs\Yanyitec.Logs.csproj", "{B12B59B0-D084-4C82-86BC-81E092AF67BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yanyitec.Logs", "Yanyitec.Logs\Yanyitec.Logs.csproj", "{B12B59B0-D084-4C82-86BC-81E092AF67BF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4CCDCF29-2619-4F63-81E0-772A80102FBA}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
