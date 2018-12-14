@@ -9,8 +9,8 @@
         string Host { get; }
         ILogWriter TraceLogWriter { get; set; }
 
-        void AddCategoryWriter(ILogWriter writer);
-        void AddTraceWriter(ILogWriter writer);
+        ILoggerFactory AddCategoryWriter(ILogWriter writer);
+        ILoggerFactory AddTraceWriter(ILogWriter writer);
         ILogger GetOrCreateLogger(string category, string traceId = null);
     }
 }

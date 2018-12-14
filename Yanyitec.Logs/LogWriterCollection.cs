@@ -9,10 +9,10 @@ namespace Yanyitec.Logs
 {
     public class LogWriterCollection : ILogWriter
     {
-        List<ILogWriter> _Writers;
+        Queue<ILogWriter> _Writers;
         public LogWriterCollection()
         {
-            this._Writers = new List<ILogWriter>();
+            this._Writers = new Queue<ILogWriter>();
         }
 
         public LogWriterCollection(IEnumerable<ILogWriter> writers) : this() {
@@ -40,15 +40,41 @@ namespace Yanyitec.Logs
             if (writer == null) return this;
             if (writer.IsCollection)
             {
-                foreach (var wr in writer)
+                
+                foreach (var toAdd in writer)
                 {
-                    
-                    if (_Writers.Any(w => w.Equals(wr) )) continue;
+                    var replaced = false;
+                    for (int i = 0, j = this._Writers.Count; i < j; i++) {
+                        var existed = this._Writers.Dequeue();
+                        if (!replaced && existed.Equals(toAdd))
+                        {
+                            this._Writers.Enqueue(toAdd);
+                            replaced = true;
+                        }
+                        else {
+                            this._Writers.Enqueue(existed);
+                        } 
+                    }
+                    if (!replaced) _Writers.Enqueue(toAdd);
 
                 }
             }
             else {
-                _Writers.Add(writer);
+                bool added = false;
+                for (int i = 0, j = this._Writers.Count; i < j; i++)
+                {
+                    var existed = this._Writers.Dequeue();
+                    if (existed.Equals(writer))
+                    {
+                        this._Writers.Enqueue(writer);
+                        added = true;
+                    }
+                    else
+                    {
+                        this._Writers.Enqueue(existed);
+                    }
+                }
+                if (!added) this._Writers.Enqueue(writer);
             }
             
             return this;
@@ -74,6 +100,25 @@ namespace Yanyitec.Logs
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this._Writers.GetEnumerator();
+        }
+
+        public int Count { get { return this._Writers.Count; } }
+
+        public bool Equals(ILogWriter other)
+        {
+            if (other == null) return false;
+            if (other.IsCollection) {
+                if (other.Count != this.Count) return false;
+                foreach (var w in this._Writers) {
+                    if (!other.Any(p => w.Equals(p))) {
+                        return false;
+                    }
+                    
+                }
+                return true;
+            } else {
+                return this._Writers.Count == 1 && this._Writers.First() == other;
+            }
         }
     }
 }

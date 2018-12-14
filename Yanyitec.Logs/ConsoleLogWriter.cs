@@ -15,6 +15,8 @@ namespace Yanyitec.Logs
             ,{ LogLevels.Warn, new ConsoleFormat(ConsoleColor.Magenta,"Warn","   ") }
             ,{ LogLevels.Error,new ConsoleFormat( ConsoleColor.Red,"Error","  ")}
         };
+
+        public static ConsoleLogWriter Default = new ConsoleLogWriter();
         public struct ConsoleFormat
         {
             public ConsoleFormat(ConsoleColor color, string name, string space)
@@ -28,10 +30,18 @@ namespace Yanyitec.Logs
             public string Space;
         }
 
-        static Encoding GB2312 = CodePagesEncodingProvider.Instance.GetEncoding("gb2312");
+        public override bool Equals(ILogWriter other)
+        {
+            return other != null && typeof(ConsoleLogWriter).IsAssignableFrom(other.GetType());
+        }
+
+        public static Encoding GB2312 = CodePagesEncodingProvider.Instance.GetEncoding("gb2312");
         protected override async Task WriteLog(LogEntry entry)
         {
             var fmt = Formats[entry.Level];
+            //var encoding = Console.OutputEncoding;
+            //var color = Console.ForegroundColor;
+
             Console.OutputEncoding = GB2312;
             Console.ForegroundColor = fmt.Color;
 
@@ -40,7 +50,9 @@ namespace Yanyitec.Logs
             Console.Write("]:");
             Console.Write(fmt.Space);
             Console.ForegroundColor = ConsoleColor.Gray;
-            Console.Write(entry.LogTime);
+            Console.Write('<');
+            Console.Write(entry.LogTime.ToString("yyyy-MM-dd hh:ss:mm"));
+            Console.Write("> ");
             if (entry.Category != null)
             {
                 Console.Write(entry.Category);
@@ -56,8 +68,9 @@ namespace Yanyitec.Logs
 
             if (entry.TraceId != null)
             {
-                Console.Write(" #");
+                Console.Write(" {");
                 Console.WriteLine(entry.TraceId);
+                Console.Write(" }");
             }
 
             Console.WriteLine();
@@ -78,6 +91,10 @@ namespace Yanyitec.Logs
                 Console.WriteLine(this.Formater == null ? entry.DetailsObject.ToString() : this.Formater.Format(entry.DetailsObject));
             }
             Console.WriteLine();
+
+
+            //Console.OutputEncoding = encoding;
+            //Console.ForegroundColor = color;
 
         }
 

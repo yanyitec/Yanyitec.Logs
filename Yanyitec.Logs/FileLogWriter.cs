@@ -19,7 +19,7 @@ namespace Yanyitec.Logs
 
         public string BaseDirectory { get; private set; }
 
-        public override bool Equals(object obj)
+        public override bool Equals(ILogWriter obj)
         {
             var other = obj as FileLogWriter;
             if (other == null) return false;
@@ -56,7 +56,7 @@ namespace Yanyitec.Logs
             var logTime = entry.LogTime;
             
             
-            if ((logTime - this.LastFiletime).Minutes >= 5)
+            if ((logTime - this.LastFiletime).Minutes > 10)
             {
                 if (logTime.Year != this.LastFiletime.Year || logTime.Month != this.LastFiletime.Month || logTime.Day != this.LastFiletime.Day || logTime.Hour != this.LastFiletime.Hour) {
                     var dir = Path.Combine(this.BaseDirectory, logTime.ToString("yyyyMMdd"));
@@ -91,8 +91,9 @@ namespace Yanyitec.Logs
             await stream.WriteAsync(fmt.LevelName);
             await stream.WriteAsync("]");
             await stream.WriteAsync(fmt.Space);
-
+            await stream.WriteAsync('<');
             await stream.WriteAsync(entry.LogTime.ToString("yyyy-MM-dd hh:mm:ss"));
+            await stream.WriteAsync("> ");
             if (entry.Category != null)
             {
                 await stream.WriteAsync(entry.Category);
@@ -106,10 +107,11 @@ namespace Yanyitec.Logs
             if (entry.TraceId != null)
             {
 
-                await stream.WriteAsync(" #");
-                await stream.WriteLineAsync(entry.TraceId);
+                await stream.WriteAsync(" {");
+                await stream.WriteAsync(entry.TraceId);
+                await stream.WriteAsync("}");
             }
-
+            await stream.WriteLineAsync();
             if (entry.Message != null) {
                 var message = entry.MessageReplacements == null ? entry.Message : string.Format(entry.Message, entry.MessageReplacements);
                 await stream.WriteLineAsync(message);

@@ -36,7 +36,7 @@ namespace Yanyitec.Logs
 
             var entry = new LogEntry()
             {
-                Level = LogLevels.All,
+                Level = lv,
                 Message = message,
                 DetailsObject = details,
                 TraceId = TraceId,

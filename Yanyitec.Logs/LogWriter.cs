@@ -2,13 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Yanyitec.Logs
 {
     public abstract class LogWriter : ILogWriter {
-        public static LogWriter Default = new ConsoleLogWriter();
+        public static LogWriter Default = ConsoleLogWriter.Default;
         public static LogWriter DefaultError = new FileLogWriter(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Logs/__err__"));
         public static LogWriter DefaultTrace = new TraceLogWriter();
 
@@ -17,6 +18,7 @@ namespace Yanyitec.Logs
         public WritingClainNode Tail { get; private set; }
         Task _WritingTask;
         public bool IsCollection => false;
+        public int Count => 1;
         public void RecordLog(LogEntry entry) {
             entry.LogTime = DateTime.Now;
             var node = new WritingClainNode(entry);
@@ -98,11 +100,19 @@ namespace Yanyitec.Logs
 
         public ILogWriter AddLogWriter(ILogWriter writer)
         {
-            if (writer==null || this.Equals(writer)) return this;
+
+            if (writer == null) {
+                return this;
+            }
+            if (this.Equals(writer))
+            {
+                return writer;
+            }
             var rs = new LogWriterCollection();
             rs.AddLogWriter(this);
             rs.AddLogWriter(writer);
             return rs;
+
 
         }
 
@@ -144,6 +154,17 @@ namespace Yanyitec.Logs
         IEnumerator IEnumerable.GetEnumerator()
         {
             return new InternalEnumerator(this);
+        }
+
+        public virtual bool Equals(ILogWriter other)
+        {
+
+            if (other.IsCollection)
+            {
+                return other.Count==0 && this == other.First();
+            }
+            else return this == other;
+            
         }
     }
 }

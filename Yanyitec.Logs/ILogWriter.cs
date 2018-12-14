@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Yanyitec.Logs
 {
-    public interface ILogWriter: IEnumerable<ILogWriter>
+    public interface ILogWriter: IEnumerable<ILogWriter>,IEquatable<ILogWriter>
     {
         void RecordLog(LogEntry entry);
 
@@ -14,6 +14,8 @@ namespace Yanyitec.Logs
         ILogWriter AddLogWriter(ILogWriter writer);
 
         bool IsCollection { get; }
+
+        int Count { get; }
 
         IDetailsFormater Formater { get; set; }
 

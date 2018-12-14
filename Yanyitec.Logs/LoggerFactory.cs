@@ -40,7 +40,7 @@ namespace Yanyitec.Logs
             return new Logger(this,this.Host,logger.CategoryWriter, category, logger.TraceWriter, logTraceId);
         }
 
-        public void AddCategoryWriter(ILogWriter writer) {
+        public ILoggerFactory AddCategoryWriter(ILogWriter writer) {
             if (this.CategoryLogWriter == null)
             {
                 this.CategoryLogWriter = writer;
@@ -49,10 +49,10 @@ namespace Yanyitec.Logs
             else {
                 this.CategoryLogWriter = this.CategoryLogWriter.AddLogWriter(writer);
             }
-           
+            return this;
         }
 
-        public void AddTraceWriter(ILogWriter writer)
+        public ILoggerFactory AddTraceWriter(ILogWriter writer)
         {
             writer.Formater = this.DetailsFormater;
             if (this.TraceLogWriter == null)
@@ -63,6 +63,7 @@ namespace Yanyitec.Logs
             {
                 this.TraceLogWriter = this.TraceLogWriter.AddLogWriter(writer);
             }
+            return this;
 
         }
 

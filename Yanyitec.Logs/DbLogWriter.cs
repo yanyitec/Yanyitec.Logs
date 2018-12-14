@@ -15,17 +15,14 @@ namespace Yanyitec.Logs
         
         public string DbName { get; private set; }
 
-        public override bool Equals(object obj)
+        public override bool Equals(ILogWriter obj)
         {
             var other = obj as DbLogWriter;
             if (other == null) return false;
             return other.DbName == this.DbName;
         }
 
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
+        
 
         public override async Task PersistentLogs(WritingClainNode node)
         {
